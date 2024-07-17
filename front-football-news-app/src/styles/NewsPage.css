@@ -1,0 +1,10 @@
+.news-page {
+    padding: 2rem;
+  }
+  
+  .news-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  

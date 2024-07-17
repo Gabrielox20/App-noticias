@@ -1,0 +1,14 @@
+.match-item {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .match-item h2 {
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .match-item p {
+    margin: 0.5rem 0;
+  }
+  

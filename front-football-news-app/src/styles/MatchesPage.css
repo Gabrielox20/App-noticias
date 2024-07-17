@@ -1,0 +1,14 @@
+.matches-page {
+    padding: 2rem;
+  }
+  
+  .year-selector {
+    margin: 1rem 0;
+  }
+  
+  .matches-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  
