@@ -19,7 +19,7 @@ const NewsPage = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/news/football`, {
+        const response = await axios.get(`http://localhost:5000/news/`, {
           params: { league: selectedLeague}
         });
         console.log(response)

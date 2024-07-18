@@ -1,49 +1,58 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-
+const puppeteer = require('puppeteer');
+const cheerio = require('cheerio');
 const News = require('../models/news');
 
 const API_KEY = process.env.NEWS_API_KEY; 
 
+const { exec } = require('child_process');
 
-// Ruta para obtener noticias de fútbol
-router.get('/football', async (req, res) => {
-    try {
-      const league = req.query.league;
-      const response = await axios.get('https://newsapi.org/v2/everything', {
-        params: {
-          qInTitle: league,
-          apiKey: API_KEY,
-          language: 'es',
-          from: '2024-06-16',
-          sortBy: 'publishedAt',
-        },
-      });
-  
-      const articles = response.data.articles.map(article => ({
-        title: article.title,
-        description: article.description,
-        url: article.url,
-        urlToImage: article.urlToImage,
-        publishedAt: article.publishedAt,
-        source: article.source.name,
-      }));
-  
-      res.json(articles);
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching news', error: error.message });
-    }
-});
-// Obtener todas las noticias
+// Ruta para realizar el web scraping y guardar los datos en la base de datos
+router.get('/scrape-and-save', (req, res) => {
+    const league = req.query.league || 'LaLiga';
+    exec(`py scrape_news.py "${league}"`, async (error, stdout, stderr) => {
+      if (error) {
+        res.status(500).json({ message: 'Error executing Python script', error: stderr });
+        return;
+      }
+      try {
+        const newsData = JSON.parse(stdout).filter(article => article.title !== 'Error fetching article');
+        
+        // Guardar las noticias en la base de datos
+        for (const article of newsData) {
+          const existingArticle = await News.findOne({ url: article.url });
+          if (!existingArticle) {
+            const newsArticle = new News({
+              ...article,
+              league
+            });
+            await newsArticle.save();
+          }
+        }
+        
+        res.json({ message: 'News articles scraped and saved successfully' });
+      } catch (parseError) {
+        res.status(500).json({ message: 'Error parsing JSON', error: parseError.message });
+      }
+    });
+  });
+
+
+  // Ruta para obtener las noticias desde la base de datos
 router.get('/', async (req, res) => {
     try {
-        const news = await News.find();
-        res.json(news);
+      const league = req.query.league || 'LaLiga';
+      const articles = await News.find({ league });
+      res.json(articles);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+      res.status(500).json({ message: err.message });
     }
-});
+  });
+
+
+
 
 // Crear una nueva noticia
 router.post('/', async (req, res) => {
