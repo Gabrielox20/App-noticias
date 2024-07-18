@@ -23,7 +23,7 @@ const MatchesPage = () => {
   useEffect(() => {
     const fetchMatches = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/results/competition/${selectedLeague}/matches`, {
+        const response = await axios.get(`https://app-noticias-backend.onrender.com/results/competition/${selectedLeague}/matches`, {
           params: { year }
         });
 
