@@ -7,7 +7,9 @@ const leagues = [
   { code: 'PD', name: 'LaLiga' },
   { code: 'SA', name: 'Serie A' },
   { code: 'BL1', name: 'Bundesliga' },
-  { code: 'FL1', name: 'Ligue 1' }
+  { code: 'FL1', name: 'Ligue 1' },
+  { code: 'BSA', name: 'Brasileirao' },
+
 ];
 
 const syncNews = async () => {

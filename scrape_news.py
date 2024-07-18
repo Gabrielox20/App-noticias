@@ -4,11 +4,6 @@ import json
 import sys
 import time
 from datetime import datetime
-import logging
-
-# Configurar logging
-logging.basicConfig(filename='logfile.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s:%(message)s')
-
 
 def fetch_article_details(article_url):
     try:
@@ -22,13 +17,6 @@ def fetch_article_details(article_url):
         url_to_image = soup.find('meta', property='og:image')['content'] if soup.find('meta', property='og:image') else None
         source = soup.find('meta', property='og:site_name')['content'] if soup.find('meta', property='og:site_name') else 'No source'
 
-        # Normalizar published_at al formato ISO 8601 si no lo está
-        if not published_at.endswith('Z'):
-            try:
-                published_at = datetime.strptime(published_at, "%d/%m/%Y %H:%M:%S").isoformat() + 'Z'
-            except ValueError:
-                published_at = datetime.utcnow().isoformat() + 'Z'
-
         return {
             'title': title,
             'description': description,
@@ -38,7 +26,6 @@ def fetch_article_details(article_url):
             'source': source
         }
     except Exception as e:
-        logging.error(f"Error fetching article details for URL {article_url}: {e}")
         return None
 
 def resolve_google_news_url(google_news_url):
@@ -47,7 +34,6 @@ def resolve_google_news_url(google_news_url):
         response.raise_for_status()
         return response.url
     except Exception as e:
-        logging.error(f"Error resolving Google News URL {google_news_url}: {e}")
         return google_news_url
 
 def get_football_news(league):
@@ -57,11 +43,10 @@ def get_football_news(league):
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
         articles = soup.find_all('article')
-        logging.debug(f"Scraping URL: {url}")
 
         article_urls = []
         for article in articles:
-            if len(article_urls) >= 20:
+            if len(article_urls) >= 10:
                 break
             link = 'https://news.google.com' + article.find('a')['href'][1:] if article.find('a') else 'No link'
             resolved_url = resolve_google_news_url(link)
@@ -77,10 +62,12 @@ def get_football_news(league):
         return json.dumps(news_data, indent=4)
 
     except Exception as e:
-        logging.error(f"Error fetching news for league {league}: {e}")
         return json.dumps({'message': 'Error fetching news', 'error': str(e)}, indent=4)
 
 if __name__ == "__main__":
-    league = sys.argv[1] if len(sys.argv) > 1 else 'LaLiga'
+    league = 'Brasileirao'
     news_json = get_football_news(league)
     print(news_json)
+    with open('logfile.log', 'a') as f:
+        f.write(news_json + '\n')
+    

@@ -11,35 +11,35 @@ const { exec } = require('child_process');
 
 // Ruta para realizar el web scraping y guardar los datos en la base de datos
 router.get('/scrape-and-save', (req, res) => {
-    const league = req.query.league || 'LaLiga';
-    exec(`py scrape_news.py "${league}"`, async (error, stdout, stderr) => {
+  const league = req.query.league || 'LaLiga';
+  exec(`py scrape_news.py "${league}"`, async (error, stdout, stderr) => {
       if (error) {
-        res.status(500).json({ message: 'Error executing Python script', error: stderr });
-        return;
+          console.error(`Error executing Python script: ${stderr}`);
+          res.status(500).json({ message: 'Error executing Python script', error: stderr });
+          return;
       }
       try {
-        const newsData = JSON.parse(stdout).filter(article => article.title !== 'Error fetching article');
-        
-        // Guardar las noticias en la base de datos
-        for (const article of newsData) {
-          const existingArticle = await News.findOne({ url: article.url });
-          if (!existingArticle) {
-            const newsArticle = new News({
-              ...article,
-              league
-            });
-            await newsArticle.save();
+          const newsData = JSON.parse(stdout).filter(article => article && article.title !== 'Error fetching article');
+          
+          // Guardar las noticias en la base de datos
+          for (const article of newsData) {
+              const existingArticle = await News.findOne({ url: article.url });
+              if (!existingArticle) {
+                  const newsArticle = new News({
+                      ...article,
+                      league
+                  });
+                  await newsArticle.save();
+              }
           }
-        }
-        
-        res.json({ message: 'News articles scraped and saved successfully' });
+          
+          res.json({ message: 'News articles scraped and saved successfully' });
       } catch (parseError) {
-        res.status(500).json({ message: 'Error parsing JSON', error: parseError.message });
+          console.error(`Error parsing JSON: ${parseError.message}`);
+          res.status(500).json({ message: 'Error parsing JSON', error: parseError.message });
       }
-    });
   });
-
-
+});
   // Ruta para obtener las noticias desde la base de datos
 router.get('/', async (req, res) => {
     try {

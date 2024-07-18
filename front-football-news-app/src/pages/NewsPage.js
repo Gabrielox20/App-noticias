@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import NewsItem from '../components/NewsItem';
-import LeagueSelector from '../components/LeagueSelector';
+import LeagueSelector from '../components/LeagueSelectorNews';
 import '../styles/NewsPage.css';
 
 const leagues = [
@@ -9,7 +9,8 @@ const leagues = [
   { code: 'PD', name: 'LaLiga' },
   { code: 'SA', name: 'Serie A' },
   { code: 'BL1', name: 'Bundesliga' },
-  { code: 'FL1', name: 'Ligue 1' }
+  { code: 'FL1', name: 'Ligue 1' },
+  { code: 'BSA', name: 'Brasileirao' },
 ];
 
 const NewsPage = () => {
@@ -19,10 +20,11 @@ const NewsPage = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/news/`, {
-          params: { league: selectedLeague}
+        console.log(selectedLeague)
+        const response = await axios.get('http://localhost:5000/news/', {
+          params: { league: selectedLeague }
         });
-        console.log(response)
+        console.log(response.data);
         setArticles(response.data);
       } catch (error) {
         console.error('Error fetching news:', error);

@@ -1,8 +1,10 @@
 .match-item {
-    border: 1px solid #ddd;
-    padding: 1rem;
-    margin: 1rem 0;
-  }
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+  width: 200px;
+  text-align: center;
+}
   
   .match-item h2 {
     margin: 0 0 0.5rem 0;

@@ -4,7 +4,7 @@ const LeagueSelector = ({ leagues, selectedLeague, onChange }) => {
   return (
     <select value={selectedLeague} onChange={(e) => onChange(e.target.value)}>
       {leagues.map((league) => (
-        <option key={league.code} value={league.code}>
+        <option key={league.code} value={league.name}>
           {league.name}
         </option>
       ))}
